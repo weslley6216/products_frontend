@@ -66,7 +66,7 @@ function ProductManagementPage() {
       setProducts(sortProductsByName(updatedProducts));
       setNewProductTempId(null);
     } catch (error) {
-      console.error('Erro ao salvar produto:', error);
+      console.error('Error deleting product:', error);
 
       const errorMessage = error.response?.data?.message;
 
