@@ -7,7 +7,16 @@ export default defineConfig({
     react(),
     tailwindcss(),
   ],
-    server: {
+  server: {
     port: 4000,
+  },
+  resolve: {
+    alias: {
+      '@': '/src'
+    },
+  },
+  test: {
+    globals: true,
+    environment: 'jsdom',
   },
 })
