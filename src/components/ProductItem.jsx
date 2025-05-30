@@ -1,9 +1,18 @@
 import { useState, useEffect } from 'react';
+import { formatCurrency } from '../utils/formatCurrency'; // Importe a função formatCurrency
 
 function ProductItem({ product, onSave, onDelete, isNewProduct }) {
   const [isEditing, setIsEditing] = useState(isNewProduct);
   
-  const parsePrice = (price) => typeof price === 'number' ? price : parseFloat(price) || 0;
+  const parsePrice = (price) => {
+    if (typeof price === 'string' && price.trim() === '') {
+      return null;
+    }
+    if (typeof price === 'number') {
+      return price;
+    }
+    return parseFloat(price) || 0;
+  };
 
   const [editedProduct, setEditedProduct] = useState({
     ...product,
@@ -107,7 +116,7 @@ function ProductItem({ product, onSave, onDelete, isNewProduct }) {
       ) : (
         <>
           <td className="px-6 py-4">{product.name}</td>
-          <td className="px-6 py-4">R$ {parsePrice(product.price).toFixed(2)}</td>
+          <td className="px-6 py-4">{formatCurrency.format(product.price)}</td>
           <td className="px-6 py-4">{product.sku}</td>
           <td className="px-6 py-4 text-center">{product.missing_letter || '-'}</td>
         </>
