@@ -1,12 +1,12 @@
 import { useState, useEffect } from 'react';
-import { formatCurrency } from '../utils/formatCurrency'; // Importe a função formatCurrency
+import { formatCurrency } from '../utils/formatCurrency';
 
 function ProductItem({ product, onSave, onDelete, isNewProduct }) {
   const [isEditing, setIsEditing] = useState(isNewProduct);
   
   const parsePrice = (price) => {
     if (typeof price === 'string' && price.trim() === '') {
-      return null;
+      return '';
     }
     if (typeof price === 'number') {
       return price;
@@ -53,19 +53,20 @@ function ProductItem({ product, onSave, onDelete, isNewProduct }) {
     }
 
     const productToSave = {
-        ...editedProduct,
-        price: parsePrice(editedProduct.price)
+      name: editedProduct.name,
+      price: parsePrice(editedProduct.price),
+      sku: editedProduct.sku
     };
 
     if (!isNewProduct &&
-        originalProduct.name === productToSave.name &&
+        originalProduct.name === productToSave.name && 
         originalProduct.price === productToSave.price &&
         originalProduct.sku === productToSave.sku) {
       setIsEditing(false);
       return;
     }
 
-    onSave(productToSave.id, productToSave);
+    onSave(product.id, productToSave);
   };
 
   const handleChange = (e) => {
