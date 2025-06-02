@@ -3,7 +3,7 @@ import { formatCurrency } from '../utils/formatCurrency';
 
 function ProductItem({ product, onSave, onDelete, isNewProduct }) {
   const [isEditing, setIsEditing] = useState(isNewProduct);
-  
+
   const parsePrice = (price) => {
     if (typeof price === 'string' && price.trim() === '') {
       return '';
@@ -25,7 +25,7 @@ function ProductItem({ product, onSave, onDelete, isNewProduct }) {
     const currentProduct = { ...product, price: parsePrice(product.price) };
     setEditedProduct(currentProduct);
     setOriginalProduct(currentProduct);
-    
+
     if (isNewProduct) {
       setIsEditing(true);
     } else {
@@ -48,25 +48,24 @@ function ProductItem({ product, onSave, onDelete, isNewProduct }) {
 
   const handleSaveClick = () => {
     if (editedProduct.name.trim() === '' || editedProduct.price === '' || editedProduct.sku.trim() === '') {
-      alert('Please, fill in all fields!');
+      alert('Por favor, preencha todos os campos!');
       return;
     }
 
     const productToSave = {
-      name: editedProduct.name,
+      ...editedProduct,
       price: parsePrice(editedProduct.price),
-      sku: editedProduct.sku
     };
 
     if (!isNewProduct &&
-        originalProduct.name === productToSave.name && 
-        originalProduct.price === productToSave.price &&
-        originalProduct.sku === productToSave.sku) {
+      originalProduct.name === productToSave.name &&
+      originalProduct.price === productToSave.price &&
+      originalProduct.sku === productToSave.sku) {
       setIsEditing(false);
       return;
     }
 
-    onSave(product.id, productToSave);
+    onSave(productToSave, isNewProduct);
   };
 
   const handleChange = (e) => {
@@ -112,14 +111,14 @@ function ProductItem({ product, onSave, onDelete, isNewProduct }) {
               placeholder="SKU"
             />
           </td>
-          <td className="px-6 py-4"></td> 
+          <td className="px-6 py-4"></td>
         </>
       ) : (
         <>
           <td className="px-6 py-4">{product.name}</td>
           <td className="px-6 py-4">{formatCurrency.format(product.price)}</td>
           <td className="px-6 py-4">{product.sku}</td>
-          <td className="px-6 py-4 text-center">{product.missing_letter || '-'}</td>
+          <td className="px-6 py-4 text-center">{product.missing_letter}</td>
         </>
       )}
       <td className="px-6 py-4 text-center">

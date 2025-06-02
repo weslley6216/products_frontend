@@ -121,11 +121,14 @@ describe('ProductItem', () => {
 
     await waitFor(() => {
       expect(mockOnSave).toHaveBeenCalledTimes(1);
-      expect(mockOnSave).toHaveBeenCalledWith(mockProduct.id, {
-        name: 'Teclado Novo',
-        price: 600,
-        sku: 'SKU002'
-      });
+      expect(mockOnSave).toHaveBeenCalledWith(
+        expect.objectContaining({
+          name: 'Teclado Novo',
+          price: 600,
+          sku: 'SKU002',
+        }),
+        false
+      );
     });
   });
 
@@ -211,7 +214,7 @@ describe('ProductItem', () => {
 
     fireEvent.click(screen.getByRole('button', { name: /salvar/i }));
 
-    expect(alertMock).toHaveBeenCalledWith('Please, fill in all fields!');
+    expect(alertMock).toHaveBeenCalledWith('Por favor, preencha todos os campos!');
     expect(mockOnSave).not.toHaveBeenCalled();
     alertMock.mockRestore();
   });
