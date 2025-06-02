@@ -10,7 +10,7 @@ describe('ProductList', () => {
   ];
   const mockOnSave = vi.fn();
   const mockOnDelete = vi.fn();
-  const mockSetNewProductTempId = vi.fn();
+  const mockSetHasNewProduct = vi.fn();
 
   beforeEach(() => {
     vi.clearAllMocks();
@@ -22,8 +22,8 @@ describe('ProductList', () => {
         products={[]}
         onSave={mockOnSave}
         onDelete={mockOnDelete}
-        newProductTempId={null}
-        setNewProductTempId={mockSetNewProductTempId}
+        hasNewProduct={false}
+        setHasNewProduct={mockSetHasNewProduct}
       />
     );
     expect(screen.getByText('Nenhum produto cadastrado.')).toBeInTheDocument();
@@ -36,8 +36,8 @@ describe('ProductList', () => {
         products={mockProducts}
         onSave={mockOnSave}
         onDelete={mockOnDelete}
-        newProductTempId={null}
-        setNewProductTempId={mockSetNewProductTempId}
+        hasNewProduct={false}
+        setHasNewProduct={mockSetHasNewProduct}
       />
     );
     expect(screen.getByRole('table')).toBeInTheDocument();
@@ -47,14 +47,13 @@ describe('ProductList', () => {
   });
 
   it('should render inputs and "Salvar"/"Cancelar" buttons for the temporary new product', () => {
-    const tempId = -999;
     render(
       <ProductList
         products={mockProducts}
         onSave={mockOnSave}
         onDelete={mockOnDelete}
-        newProductTempId={tempId}
-        setNewProductTempId={mockSetNewProductTempId}
+        hasNewProduct={true}
+        setHasNewProduct={mockSetHasNewProduct}
       />
     );
 
@@ -65,23 +64,22 @@ describe('ProductList', () => {
     expect(screen.getByRole('button', { name: /cancelar/i })).toBeInTheDocument();
   });
 
-  it('should call setNewProductTempId when "Cancelar" is clicked for a temporary product', () => {
-    const tempId = -999;
+  it('should call setHasNewProduct(false) when "Cancelar" is clicked for a temporary product', () => {
     render(
       <ProductList
         products={mockProducts}
         onSave={mockOnSave}
         onDelete={mockOnDelete}
-        newProductTempId={tempId}
-        setNewProductTempId={mockSetNewProductTempId}
+        hasNewProduct={true}
+        setHasNewProduct={mockSetHasNewProduct}
       />
     );
 
     const cancelButton = screen.getByRole('button', { name: /cancelar/i });
     fireEvent.click(cancelButton);
 
-    expect(mockSetNewProductTempId).toHaveBeenCalledTimes(1);
-    expect(mockSetNewProductTempId).toHaveBeenCalledWith(null);
+    expect(mockSetHasNewProduct).toHaveBeenCalledTimes(1);
+    expect(mockSetHasNewProduct).toHaveBeenCalledWith(false);
     expect(mockOnDelete).not.toHaveBeenCalled();
   });
 
@@ -91,8 +89,8 @@ describe('ProductList', () => {
         products={mockProducts}
         onSave={mockOnSave}
         onDelete={mockOnDelete}
-        newProductTempId={null}
-        setNewProductTempId={mockSetNewProductTempId}
+        hasNewProduct={false}
+        setHasNewProduct={mockSetHasNewProduct}
       />
     );
 
@@ -109,8 +107,8 @@ describe('ProductList', () => {
         products={mockProducts}
         onSave={mockOnSave}
         onDelete={mockOnDelete}
-        newProductTempId={null}
-        setNewProductTempId={mockSetNewProductTempId}
+        hasNewProduct={false}
+        setHasNewProduct={mockSetHasNewProduct}
       />
     );
 
@@ -124,20 +122,19 @@ describe('ProductList', () => {
 
     expect(mockOnSave).toHaveBeenCalledTimes(1);
     expect(mockOnSave).toHaveBeenCalledWith(
-      mockProducts[0].id,
-      expect.objectContaining({ name: 'Produto A Modificado' })
+      expect.objectContaining({ id: 1, name: 'Produto A Modificado' }),
+      false
     );
   });
 
   it('should call onSave for a new temporary product when "Salvar" is clicked', async () => {
-    const tempId = -999;
     render(
       <ProductList
         products={[]}
         onSave={mockOnSave}
         onDelete={mockOnDelete}
-        newProductTempId={tempId}
-        setNewProductTempId={mockSetNewProductTempId}
+        hasNewProduct={true}
+        setHasNewProduct={mockSetHasNewProduct}
       />
     );
 
@@ -153,12 +150,8 @@ describe('ProductList', () => {
 
     expect(mockOnSave).toHaveBeenCalledTimes(1);
     expect(mockOnSave).toHaveBeenCalledWith(
-      tempId,
-      expect.objectContaining({
-        name: 'Novo Produto Teste',
-        price: 123.45,
-        sku: 'NPT001',
-      })
+      expect.objectContaining({ id: null, name: 'Novo Produto Teste' }),
+      true
     );
   });
 });

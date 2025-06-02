@@ -1,9 +1,9 @@
 import ProductItem from './ProductItem';
 
-function ProductList({ products, onSave, onDelete, newProductTempId, setNewProductTempId }) {
-  const productsToDisplay = newProductTempId
-    ? [{ id: newProductTempId, name: '', price: '', sku: '', missing_letter: '' }, ...products]
-    : products;
+function ProductList({ products, onSave, onDelete, hasNewProduct, setHasNewProduct }) {
+
+  const newProduct = { id: null, name: '', price: '', sku: '' }
+  const productsToDisplay = hasNewProduct ? [newProduct, ...products] : products;
 
   return (
     <div className="bg-white shadow-md rounded my-6 overflow-x-auto">
@@ -21,15 +21,20 @@ function ProductList({ products, onSave, onDelete, newProductTempId, setNewProdu
             </tr>
           </thead>
           <tbody className="bg-white divide-y divide-gray-200">
-            {productsToDisplay.map((product) => (
-              <ProductItem
-                key={product.id}
-                product={product}
-                onSave={onSave}
-                onDelete={product.id < 0 ? () => setNewProductTempId(null) : onDelete}
-                isNewProduct={product.id < 0}
-              />
-            ))}
+            {productsToDisplay.map((product) => {
+              const isNewProduct = product.id === null;
+              const cancelNewProduct = () => setHasNewProduct(false);
+
+              return (
+                <ProductItem
+                  key={product.id || 'new-product'}
+                  product={product}
+                  onSave={onSave}
+                  onDelete={isNewProduct ? cancelNewProduct : onDelete}
+                  isNewProduct={isNewProduct}
+                />
+              );
+            })}
           </tbody>
         </table>
       )}
