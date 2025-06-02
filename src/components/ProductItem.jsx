@@ -1,18 +1,8 @@
 import { useState, useEffect } from 'react';
-import { formatCurrency } from '../utils/formatCurrency';
+import { formatCurrency, parsePrice } from '../utils/formatters';
 
 function ProductItem({ product, onSave, onDelete, isNewProduct }) {
   const [isEditing, setIsEditing] = useState(isNewProduct);
-
-  const parsePrice = (price) => {
-    if (typeof price === 'string' && price.trim() === '') {
-      return '';
-    }
-    if (typeof price === 'number') {
-      return price;
-    }
-    return parseFloat(price) || 0;
-  };
 
   const [editedProduct, setEditedProduct] = useState({
     ...product,
@@ -33,9 +23,7 @@ function ProductItem({ product, onSave, onDelete, isNewProduct }) {
     }
   }, [product, isNewProduct]);
 
-  const handleEditClick = () => {
-    setIsEditing(true);
-  };
+  const handleEditClick = () => (setIsEditing(true));
 
   const handleCancelClick = () => {
     if (isNewProduct) {
