@@ -54,8 +54,8 @@ describe('ProductManagementPage', () => {
           ]),
           onSave: expect.any(Function),
           onDelete: expect.any(Function),
-          newProductTempId: null,
-          setNewProductTempId: expect.any(Function)
+          hasNewProduct: false,
+          setHasNewProduct: expect.any(Function)
         }, undefined
       );
     });

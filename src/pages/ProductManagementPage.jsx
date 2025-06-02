@@ -6,7 +6,7 @@ function ProductManagementPage() {
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [newProductTempId, setNewProductTempId] = useState(null);
+  const [hasNewProduct, setHasNewProduct] = useState(false);
 
   const sortProductsByName = useCallback((productList) => {
     return [...productList].sort((a, b) => a.name.localeCompare(b.name));
@@ -30,17 +30,15 @@ function ProductManagementPage() {
   }, [sortProductsByName]);
 
   const handleAddClick = () => {
-    if (!newProductTempId) {
-      setNewProductTempId(Date.now() * -1);
-    }
+    setHasNewProduct(true);
   };
 
   const handleDelete = async (id) => {
     if (window.confirm('Tem certeza que deseja deletar este produto?')) {
       try {
         await productService.deleteProduct(id);
-        const updatedProducts = products.filter(product => product.id !== id);
-        setProducts(sortProductsByName(updatedProducts));
+        const updatedListProducts = products.filter(product => product.id !== id);
+        setProducts(sortProductsByName(updatedListProducts));
       } catch (error) {
         console.error('Error deleting product:', error);
         alert('Não foi possível deletar o produto.');
@@ -48,28 +46,27 @@ function ProductManagementPage() {
     }
   };
 
-  const handleSaveProduct = async (id, productData) => {
+  const handleSaveProduct = async (product, isNewProduct) => {
     try {
       let savedProduct;
-      let updatedProducts;
+      let updatedListProducts;
 
-      if (id > 0) { 
-        savedProduct = await productService.updateProduct(id, productData);
-        updatedProducts = products.map(product =>
-          product.id === id ? savedProduct : product
-        );
-      } else { 
-        const { name, price, sku } = productData;
+      if (isNewProduct) {
+        const { name, price, sku } = product;
         savedProduct = await productService.addProduct({ name, price, sku });
-        updatedProducts = [...products, savedProduct];
+        updatedListProducts = [...products, savedProduct];
+        setHasNewProduct(false);
+      } else {
+        savedProduct = await productService.updateProduct(product.id, product);
+        updatedListProducts = products.map(existingProduct =>
+          existingProduct.id === product.id ? savedProduct : existingProduct
+        );
       }
-      setProducts(sortProductsByName(updatedProducts));
-      setNewProductTempId(null);
+
+      setProducts(sortProductsByName(updatedListProducts));
     } catch (error) {
-      console.error('Error deleting product:', error);
-
+      console.error('Error saving product:', error);
       const errorMessage = error.response?.data?.message;
-
       if (errorMessage) {
         alert(`Erro ao salvar: ${errorMessage}`);
       } else {
@@ -96,7 +93,7 @@ function ProductManagementPage() {
         <button
           onClick={handleAddClick}
           className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
-          disabled={newProductTempId !== null}
+          disabled={hasNewProduct}
         >
           Adicionar Novo Produto
         </button>
@@ -106,8 +103,8 @@ function ProductManagementPage() {
         products={products}
         onSave={handleSaveProduct}
         onDelete={handleDelete}
-        newProductTempId={newProductTempId}
-        setNewProductTempId={setNewProductTempId}
+        hasNewProduct={hasNewProduct}
+        setHasNewProduct={setHasNewProduct}
       />
     </div>
   );
